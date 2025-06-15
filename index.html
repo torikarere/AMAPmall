@@ -1,0 +1,168 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AMAP Shopping Centre Directory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>AMAP Shopping Centre</h1>
+    <button id="zoomToggle">Toggle Large Text</button>
+  </header>
+
+  <main class="container">
+    <!-- Left Column: Promotions / Ads -->
+    <section class="sidebar">
+      <h2>Special Offers</h2>
+      <ul>
+        <li>🔥 50% off at Zara</li>
+        <li>🎉 Free coffee at Costa</li>
+        <li>🎁 Spend £50 get £10 at Boots</li>
+      </ul>
+    </section>
+
+    <!-- Centre Column: Categories & Results -->
+    <section class="main-content">
+      <h2>Browse Categories</h2>
+      <div class="categories">
+        <button onclick="showCategory('banks')">Banks</button>
+        <button onclick="showCategory('shopping')">Shopping</button>
+        <button onclick="showCategory('food')">Food</button>
+        <button onclick="showCategory('parking')">Parking</button>
+        <button onclick="showCategory('disabled')">Disabled Access</button>
+        <button onclick="showCategory('fire')">Fire Exits</button>
+      </div>
+      <div id="results" class="results">
+        <p>Select a category to see results.</p>
+      </div>
+    </section>
+
+    <!-- Right Column: Map -->
+    <section class="map">
+      <h2>Centre Map</h2>
+    <div>
+<div>
+  <button onclick="zoomIn()">Zoom In</button>
+  <button onclick="zoomOut()">Zoom Out</button>
+</div>
+
+<div class="scroll-box">
+  <div id="zoomContent">
+    <img src="images/map.png" alt="Map" id="mapImage" />
+  </div>
+</div>
+
+
+     <!-- Add this inside your main-content section, above results -->  
+    </div>
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Search..." aria-label="Search" />
+  <div id="keyboard" class="keyboard"></div>
+</div>
+      <p><strong>Note:</strong> 'Voice Input' coming soon.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Cats world domination 🐈</p>
+  </footer>
+
+  <script>
+    const data = {
+      banks: ["Monzo Bank", " Revolut Bank", "Santander Bank", "Lloyds Bank"],
+      shopping: ["Zara", "Primark", "Boots", "Tesco", "Sainsbury's", "Beauty4You"],
+      food: ["KFC", "Costa", "Pret", "Starbucks", "Mcdonald's", "Dunkin'", "Hangry Pizza", "Joe & The Juice", "Fresh Pasta", "Greggs"],
+      parking: ["North Car Park", "East Parking", "VIP Parking"],
+      disabled: ["Wheelchair access at every entrance", "Disabled toilets - Near Greggs, inside Sainsbury's"],
+      fire: ["Exit A - Near Zara", "Exit B - Near Starbucks", "Exit C - North Entrance"]
+    };
+
+    function showCategory(cat) {
+      const list = data[cat].map(item => `<li>${item}</li>`).join('');
+      document.getElementById('results').innerHTML = `<ul>${list}</ul>`;
+    }
+
+    document.getElementById('zoomToggle').addEventListener('click', () => {
+      document.body.classList.toggle('large-text');
+    });
+
+    /* Add this script below your existing JS in <script> tag */
+
+// Keyboard layout - simple QWERTY + Backspace + Space + Clear
+const keys = [
+  'Q','W','E','R','T','Y','U','I','O','P',
+  'A','S','D','F','G','H','J','K','L',
+  'Backspace','Z','X','C','V','B','N','M','Space','Clear'
+];
+
+const keyboardDiv = document.getElementById('keyboard');
+const input = document.getElementById('searchInput');
+
+keys.forEach(key => {
+  const keyBtn = document.createElement('button');
+  keyBtn.classList.add('key');
+  keyBtn.textContent = key;
+  keyboardDiv.appendChild(keyBtn);
+
+  keyBtn.addEventListener('click', () => {
+    if (key === 'Backspace') {
+      input.value = input.value.slice(0, -1);
+    } else if (key === 'Space') {
+      input.value += ' ';
+    } else if (key === 'Clear') {
+      input.value = '';
+    } else {
+      input.value += key;
+    }
+    input.focus();
+    filterResults(input.value.toLowerCase());
+  });
+});
+
+function filterResults(query) {
+  const resultsDiv = document.getElementById('results');
+  if (!query) {
+    resultsDiv.innerHTML = '<p>Select a category to see results.</p>';
+    return;
+  }
+
+  let matches = [];
+  for (const cat in data) {
+    matches = matches.concat(data[cat].filter(item => item.toLowerCase().includes(query)));
+  }
+
+  if (matches.length) {
+    resultsDiv.innerHTML = '<ul>' + matches.map(item => `<li>${item}</li>`).join('') + '</ul>';
+  } else {
+    resultsDiv.innerHTML = '<p>No results found.</p>';
+  }
+}
+
+// Optional: Also filter as user types on physical keyboard
+input.addEventListener('input', (e) => {
+  filterResults(e.target.value.toLowerCase());
+});
+
+  let zoom = 1;
+
+  function zoomIn() {
+    zoom += 0.1;
+    updateZoom();
+  }
+
+  function zoomOut() {
+    zoom = Math.max(0.5, zoom - 0.1);
+    updateZoom();
+  }
+
+  function updateZoom() {
+    const img = document.getElementById("mapImage");
+    img.style.width = 330 * zoom + "px";
+    img.style.height = 290 * zoom + "px";
+  }
+  </script>
+</body>
+</html>
